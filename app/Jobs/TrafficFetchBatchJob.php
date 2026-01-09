@@ -81,7 +81,6 @@ class TrafficFetchBatchJob implements ShouldQueue
                                 't' => (int)$currentTime,
                                 'u' => DB::raw('u + ' . $uIncrement),
                                 'd' => DB::raw('d + ' . $dIncrement),
-                                'updated_at' => (int)$currentTime,  // Unix timestamp per User model dateFormat
                             ]);
                     }
                 }, 3); // 3 attempts for deadlock retries

@@ -22,8 +22,7 @@ Added the following configurations to `config/database.php`:
 
 - `DB_PERSISTENT`: 持久连接选项 (Persistent connection option)
 - `DB_TIMEOUT`: 连接超时时间 (Connection timeout)
-- `DB_POOL_MIN/MAX`: 连接池大小 (Connection pool size)
-- MySQL session `wait_timeout`: 设置为 30 秒 (Set to 30 seconds)
+- `DB_WAIT_TIMEOUT`: MySQL 空闲超时时间，默认 300 秒 (MySQL idle timeout, default 300 seconds)
 
 ### 3. 显式连接清理 (Explicit Connection Cleanup)
 
