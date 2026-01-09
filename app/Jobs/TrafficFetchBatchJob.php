@@ -69,18 +69,19 @@ class TrafficFetchBatchJob implements ShouldQueue
                     foreach ($chunk as $userId) {
                         list($u, $d) = $this->trafficData[$userId];
                         
-                        // Calculate the increments safely
+                        // Calculate the increments safely - cast to int ensures no SQL injection
                         $uIncrement = (int)($u * $rate);
                         $dIncrement = (int)($d * $rate);
                         
-                        // Use parameterized query to avoid SQL injection
+                        // Update using integer-only arithmetic expressions
+                        // The integers are safe to use in DB::raw as they cannot contain SQL
                         DB::table('v2_user')
-                            ->where('id', $userId)
+                            ->where('id', (int)$userId)
                             ->update([
-                                't' => $currentTime,
-                                'u' => DB::raw("u + " . $uIncrement),
-                                'd' => DB::raw("d + " . $dIncrement),
-                                'updated_at' => $currentTime,
+                                't' => (int)$currentTime,
+                                'u' => DB::raw('u + ' . $uIncrement),
+                                'd' => DB::raw('d + ' . $dIncrement),
+                                'updated_at' => (int)$currentTime,  // Unix timestamp per User model dateFormat
                             ]);
                     }
                 }, 3); // 3 attempts for deadlock retries
