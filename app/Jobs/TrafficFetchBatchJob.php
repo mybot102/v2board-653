@@ -10,6 +10,16 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * Batch traffic update job
+ * 
+ * This job processes traffic updates for multiple users in batches to reduce
+ * database connection overhead. Instead of opening one connection per user,
+ * it processes users in chunks and explicitly closes connections after each chunk.
+ * 
+ * This significantly reduces the number of concurrent database connections when
+ * handling traffic data from servers with many active users.
+ */
 class TrafficFetchBatchJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
