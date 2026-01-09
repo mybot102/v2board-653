@@ -48,14 +48,6 @@ DB_PERSISTENT=false
 # 连接超时时间（秒，默认：3）
 # Connection timeout (seconds, default: 3)
 DB_TIMEOUT=3
-
-# 连接池最小连接数（默认：1）
-# Minimum connections in pool (default: 1)
-DB_POOL_MIN=1
-
-# 连接池最大连接数（默认：10）
-# Maximum connections in pool (default: 10)
-DB_POOL_MAX=10
 ```
 
 ### 批量模式开关 (Batch Mode Toggle)

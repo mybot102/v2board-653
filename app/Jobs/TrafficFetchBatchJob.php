@@ -9,6 +9,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Batch traffic update job
@@ -68,13 +69,17 @@ class TrafficFetchBatchJob implements ShouldQueue
                     foreach ($chunk as $userId) {
                         list($u, $d) = $this->trafficData[$userId];
                         
-                        // Use a single update query instead of loading the model
+                        // Calculate the increments safely
+                        $uIncrement = (int)($u * $rate);
+                        $dIncrement = (int)($d * $rate);
+                        
+                        // Use parameterized query to avoid SQL injection
                         DB::table('v2_user')
                             ->where('id', $userId)
                             ->update([
                                 't' => $currentTime,
-                                'u' => DB::raw("u + " . ($u * $rate)),
-                                'd' => DB::raw("d + " . ($d * $rate)),
+                                'u' => DB::raw("u + " . $uIncrement),
+                                'd' => DB::raw("d + " . $dIncrement),
                                 'updated_at' => $currentTime,
                             ]);
                     }
@@ -83,7 +88,7 @@ class TrafficFetchBatchJob implements ShouldQueue
                 // Explicitly disconnect after each chunk to free the connection
                 DB::disconnect();
             } catch (\Exception $e) {
-                \Log::error("Batch traffic update failed for chunk", [
+                Log::error("Batch traffic update failed for chunk", [
                     'error' => $e->getMessage(),
                     'user_ids' => $chunk
                 ]);
