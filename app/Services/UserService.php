@@ -174,12 +174,30 @@ class UserService
         $statService->setStartAt(strtotime(date('Y-m-d')));
         $statService->setUserStats();
         $statService->setServerStats();
-        foreach (array_keys($data) as $userId) {
-            $u = $data[$userId][0];
-            $d = $data[$userId][1];
-            TrafficFetchJob::dispatch($u, $d, $userId, $server, $protocol);
-            $statService->statServer($server['id'], $protocol, $u, $d);
-            $statService->statUser($server['rate'], $userId, $u, $d);
+        
+        // Use batch mode by default to reduce database connections
+        $useBatchMode = config('v2board.traffic_fetch_batch_mode', true);
+        
+        if ($useBatchMode) {
+            // Dispatch a single batch job for all users
+            \App\Jobs\TrafficFetchBatchJob::dispatch($data, $server, $protocol);
+            
+            // Still update statistics for each user
+            foreach (array_keys($data) as $userId) {
+                $u = $data[$userId][0];
+                $d = $data[$userId][1];
+                $statService->statServer($server['id'], $protocol, $u, $d);
+                $statService->statUser($server['rate'], $userId, $u, $d);
+            }
+        } else {
+            // Legacy mode: dispatch individual jobs (can cause connection issues)
+            foreach (array_keys($data) as $userId) {
+                $u = $data[$userId][0];
+                $d = $data[$userId][1];
+                TrafficFetchJob::dispatch($u, $d, $userId, $server, $protocol);
+                $statService->statServer($server['id'], $protocol, $u, $d);
+                $statService->statUser($server['rate'], $userId, $u, $d);
+            }
         }
     }
 }
