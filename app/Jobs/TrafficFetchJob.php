@@ -44,14 +44,19 @@ class TrafficFetchJob implements ShouldQueue
      */
     public function handle()
     {
-        $user = User::lockForUpdate()->find($this->userId);
-        if (!$user) return;
+        try {
+            $user = User::lockForUpdate()->find($this->userId);
+            if (!$user) return;
 
-        $user->t = time();
-        $user->u = $user->u + ($this->u * $this->server['rate']);
-        $user->d = $user->d + ($this->d * $this->server['rate']);
-        if (!$user->save()) {
-            info("流量更新失败\n未记录用户ID:{$this->userId}\n未记录上行:{$user->u}\n未记录下行:{$user->d}");
+            $user->t = time();
+            $user->u = $user->u + ($this->u * $this->server['rate']);
+            $user->d = $user->d + ($this->d * $this->server['rate']);
+            if (!$user->save()) {
+                info("流量更新失败\n未记录用户ID:{$this->userId}\n未记录上行:{$user->u}\n未记录下行:{$user->d}");
+            }
+        } finally {
+            // Explicitly disconnect to free the database connection
+            \Illuminate\Support\Facades\DB::disconnect();
         }
     }
 }
