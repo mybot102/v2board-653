@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Jobs\StatServerJob;
 use App\Jobs\StatUserJob;
 use App\Jobs\TrafficFetchJob;
+use App\Jobs\TrafficFetchBatchJob;
 use App\Models\Order;
 use App\Models\Plan;
 use App\Models\User;
@@ -180,7 +181,7 @@ class UserService
         
         if ($useBatchMode) {
             // Dispatch a single batch job for all users
-            \App\Jobs\TrafficFetchBatchJob::dispatch($data, $server, $protocol);
+            TrafficFetchBatchJob::dispatch($data, $server, $protocol);
             
             // Still update statistics for each user
             foreach (array_keys($data) as $userId) {

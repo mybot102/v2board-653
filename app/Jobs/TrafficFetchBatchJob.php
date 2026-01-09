@@ -60,6 +60,8 @@ class TrafficFetchBatchJob implements ShouldQueue
         $rate = $this->server['rate'];
         
         // Batch update users in chunks to avoid long-running transactions
+        // Process 100 users at a time, then explicitly disconnect to free connections
+        // This is the core optimization: chunk + disconnect pattern
         $userIds = array_keys($this->trafficData);
         $chunks = array_chunk($userIds, 100);
         
