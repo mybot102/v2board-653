@@ -48,6 +48,10 @@ DB_PERSISTENT=false
 # 连接超时时间（秒，默认：3）
 # Connection timeout (seconds, default: 3)
 DB_TIMEOUT=3
+
+# 数据库空闲超时时间（秒，默认：300）
+# Database idle timeout (seconds, default: 300)
+DB_WAIT_TIMEOUT=300
 ```
 
 ### 批量模式开关 (Batch Mode Toggle)

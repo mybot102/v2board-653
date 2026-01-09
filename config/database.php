@@ -62,7 +62,7 @@ return [
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
                 PDO::ATTR_PERSISTENT => env('DB_PERSISTENT', false),
                 PDO::ATTR_TIMEOUT => env('DB_TIMEOUT', 3),
-                PDO::MYSQL_ATTR_INIT_COMMAND => "SET SESSION wait_timeout=30",
+                PDO::MYSQL_ATTR_INIT_COMMAND => "SET SESSION wait_timeout=" . env('DB_WAIT_TIMEOUT', 300),
             ]) : [],
         ],
 

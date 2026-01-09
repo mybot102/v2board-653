@@ -86,7 +86,9 @@ class TrafficFetchBatchJob implements ShouldQueue
                     }
                 }, 3); // 3 attempts for deadlock retries
                 
-                // Explicitly disconnect after each chunk to free the connection
+                // Explicitly disconnect after each chunk to free the connection immediately
+                // This is the key optimization: instead of keeping connections alive,
+                // we process chunks and release connections back to the pool
                 DB::disconnect();
             } catch (\Exception $e) {
                 Log::error("Batch traffic update failed for chunk", [
